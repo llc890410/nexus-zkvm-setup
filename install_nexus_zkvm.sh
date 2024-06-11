@@ -26,9 +26,9 @@ cargo nexus new nexus-project
 # 移動到項目目錄
 cd nexus-project/src
 
-# 修改 main.rs 文件
-cat <<EOL > main.rs
-#![no_std]
+# 定義多個不同的main.rs內容
+main_rs_contents=(
+'#![no_std]
 #![no_main]
 
 fn fib(n: u32) -> u32 {
@@ -45,7 +45,190 @@ fn main() {
     let result = fib(n);
     assert_eq!(result, 13);
 }
-EOL
+'
+'#![no_std]
+#![no_main]
+
+fn sum(a: u32, b: u32) -> u32 {
+    a + b
+}
+
+#[nexus_rt::main]
+fn main() {
+    let a = 3;
+    let b = 4;
+    let result = sum(a, b);
+    assert_eq!(result, 7);
+}
+'
+'#![no_std]
+#![no_main]
+
+fn factorial(n: u32) -> u32 {
+    match n {
+        0 => 1,
+        _ => n * factorial(n - 1),
+    }
+}
+
+#[nexus_rt::main]
+fn main() {
+    let n = 5;
+    let result = factorial(n);
+    assert_eq!(result, 120);
+}
+'
+'#![no_std]
+#![no_main]
+
+fn square(n: u32) -> u32 {
+    n * n
+}
+
+#[nexus_rt::main]
+fn main() {
+    let n = 6;
+    let result = square(n);
+    assert_eq!(result, 36);
+}
+'
+'#![no_std]
+#![no_main]
+
+fn power(base: u32, exp: u32) -> u32 {
+    if exp == 0 {
+        1
+    } else {
+        base * power(base, exp - 1)
+    }
+}
+
+#[nexus_rt::main]
+fn main() {
+    let base = 2;
+    let exp = 3;
+    let result = power(base, exp);
+    assert_eq!(result, 8);
+}
+'
+'#![no_std]
+#![no_main]
+
+fn gcd(a: u32, b: u32) -> u32 {
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
+}
+
+#[nexus_rt::main]
+fn main() {
+    let a = 48;
+    let b = 18;
+    let result = gcd(a, b);
+    assert_eq!(result, 6);
+}
+'
+'#![no_std]
+#![no_main]
+
+fn lcm(a: u32, b: u32) -> u32 {
+    (a * b) / gcd(a, b)
+}
+
+fn gcd(a: u32, b: u32) -> u32 {
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
+}
+
+#[nexus_rt::main]
+fn main() {
+    let a = 12;
+    let b = 15;
+    let result = lcm(a, b);
+    assert_eq!(result, 60);
+}
+'
+'#![no_std]
+#![no_main]
+
+fn abs_diff(a: i32, b: i32) -> i32 {
+    if a > b {
+        a - b
+    } else {
+        b - a
+    }
+}
+
+#[nexus_rt::main]
+fn main() {
+    let a = 7;
+    let b = 10;
+    let result = abs_diff(a, b);
+    assert_eq!(result, 3);
+}
+'
+'#![no_std]
+#![no_main]
+
+fn is_even(n: u32) -> bool {
+    n % 2 == 0
+}
+
+#[nexus_rt::main]
+fn main() {
+    let n = 4;
+    let result = is_even(n);
+    assert!(result);
+}
+'
+'#![no_std]
+#![no_main]
+
+fn is_prime(n: u32) -> bool {
+    if n <= 1 {
+        return false;
+    }
+    for i in 2..n {
+        if n % i == 0 {
+            return false;
+        }
+    }
+    true
+}
+
+#[nexus_rt::main]
+fn main() {
+    let n = 5;
+    let result = is_prime(n);
+    assert!(result);
+}
+'
+'#![no_std]
+#![no_main]
+
+fn reverse_array(arr: &mut [i32]) {
+    arr.reverse();
+}
+
+#[nexus_rt::main]
+fn main() {
+    let mut arr = [1, 2, 3, 4, 5];
+    reverse_array(&mut arr);
+    assert_eq!(arr, [5, 4, 3, 2, 1]);
+}
+'
+)
+
+# 隨機選擇一個main.rs內容
+selected_main_rs="${main_rs_contents[$RANDOM % ${#main_rs_contents[@]}]}"
+
+# 寫入main.rs文件
+echo "$selected_main_rs" > main.rs
 
 # 返回到項目根目錄
 cd ..
